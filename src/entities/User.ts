@@ -24,7 +24,7 @@ export default class User {
   @Column({ nullable: false, unique: true })
   email!: string;
 
-  @Column({ nullable: false, length: 300 })
+  @Column({ nullable: false, length: 300, select: false })
   passwordHash!: string;
 
   @OneToOne(() => UserProfile, { cascade: true, eager: true })

@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from 'src/entities/User';
+import UserProfile from 'src/entities/UserProfile';
 import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { ListUsersParams } from './dto';
+import { CreateUserDto, ListUsersParams } from 'src/dto';
+import { hashPassword } from 'src/utils';
 
 @Injectable()
 export class UsersService {
@@ -10,7 +12,7 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
 
-  public async getMany(params: ListUsersParams) {
+  public async findMany(params: ListUsersParams) {
     const options: FindManyOptions<User> = {
       skip: 0,
       take: 25,
@@ -34,5 +36,43 @@ export class UsersService {
     options.where = where;
 
     return await this.userRepo.findAndCount(options);
+  }
+
+  public async findOne(id: string): Promise<User> {
+    return this.userRepo.findOneBy({ id });
+  }
+
+  public async create(userData: CreateUserDto): Promise<User> {
+    const user = new User();
+    user.profile = new UserProfile();
+
+    user.email = userData.email;
+    user.passwordHash = hashPassword(userData.password);
+
+    if (userData.fullName !== undefined) {
+      user.profile.fullName = userData.fullName;
+    }
+
+    if (userData.document !== undefined) {
+      user.profile.document = userData.document;
+    }
+
+    if (userData.birthday !== undefined) {
+      user.profile.birthday = userData.birthday;
+    }
+
+    if (userData.gender !== undefined) {
+      user.profile.gender = userData.gender;
+    }
+
+    if (userData.active !== undefined) {
+      user.active = userData.active;
+    }
+
+    if (userData.admin !== undefined) {
+      user.admin = userData.admin;
+    }
+
+    return await this.userRepo.save(user);
   }
 }
