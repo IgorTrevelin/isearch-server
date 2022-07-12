@@ -9,6 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { CreateUserDto, ListUsersParams } from 'src/dto';
+import { stripUsersPasswordHash } from 'src/utils';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -20,19 +21,19 @@ export class UsersController {
     const [users, total] = await this.userService.findMany(query);
 
     return {
-      data: users,
+      data: stripUsersPasswordHash(users),
       total,
     };
   }
 
   @Get(':id')
   public async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.userService.getById(id);
+    return stripUsersPasswordHash(await this.userService.getById(id));
   }
 
   @Post()
   public async create(@Body() CreateUserDto: CreateUserDto) {
-    return await this.userService.create(CreateUserDto);
+    return stripUsersPasswordHash(await this.userService.create(CreateUserDto));
   }
 
   @Put(':id')
@@ -40,6 +41,8 @@ export class UsersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: CreateUserDto,
   ) {
-    return await this.userService.update(id, updateUserDto);
+    return stripUsersPasswordHash(
+      await this.userService.update(id, updateUserDto),
+    );
   }
 }
