@@ -3,10 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import User from 'src/entities/User';
 import UserProfile from 'src/entities/UserProfile';
 import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { CreateUserDto, ListUsersParams } from 'src/dto';
+import { CreateUserDto, ListUsersParams, UpdateUserDto } from 'src/dto';
 import { hashPassword } from 'src/utils';
 import { UserNotFound } from './error';
-import { UpdateUserDto } from 'src/dto/updateuser.dto';
 
 @Injectable()
 export class UsersService {

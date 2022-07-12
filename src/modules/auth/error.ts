@@ -1,10 +1,11 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
 
-export class WrongPassword extends UnauthorizedException {
+export class WrongPassword extends BadRequestException {
   constructor() {
     super(
       new HttpException('Wrong password', HttpStatus.UNAUTHORIZED),

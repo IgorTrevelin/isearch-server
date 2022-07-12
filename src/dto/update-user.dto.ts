@@ -12,11 +12,11 @@ import { Gender } from 'src/types';
 export class UpdateUserDto {
   @IsOptional()
   @IsEmail()
-  email: string;
+  email?: string;
 
   @IsOptional()
   @Length(8, 20)
-  password: string;
+  password?: string;
 
   @IsOptional()
   @Length(0, 120)

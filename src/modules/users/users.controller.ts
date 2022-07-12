@@ -7,15 +7,38 @@ import {
   Post,
   Put,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto, ListUsersParams } from 'src/dto';
+import { Request } from 'express';
+import { CreateUserDto, ListUsersParams, UpdateMeDto } from 'src/dto';
+import User from 'src/entities/User';
 import { stripUsersPasswordHash } from 'src/utils';
+import { Admin } from '../auth/admin.decorator';
+import { AdminGuard } from '../auth/admin.guard';
 import { UsersService } from './users.service';
 
+@UseGuards(AdminGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
+  @Get('me/')
+  public async getMe(@Req() req: Request) {
+    const user: any = req.user;
+    return stripUsersPasswordHash(user);
+  }
+
+  @Put('me/')
+  public async updateMe(@Req() req: Request, @Body() updateMeDto: UpdateMeDto) {
+    const user: User = req.user as User;
+
+    return stripUsersPasswordHash(
+      await this.userService.update(user.id, updateMeDto),
+    );
+  }
+
+  @Admin()
   @Get()
   public async findMany(@Query() query: ListUsersParams) {
     const [users, total] = await this.userService.findMany(query);
@@ -26,16 +49,19 @@ export class UsersController {
     };
   }
 
+  @Admin()
   @Get(':id')
   public async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return stripUsersPasswordHash(await this.userService.getById(id));
   }
 
+  @Admin()
   @Post()
   public async create(@Body() CreateUserDto: CreateUserDto) {
     return stripUsersPasswordHash(await this.userService.create(CreateUserDto));
   }
 
+  @Admin()
   @Put(':id')
   public async update(
     @Param('id', ParseUUIDPipe) id: string,
