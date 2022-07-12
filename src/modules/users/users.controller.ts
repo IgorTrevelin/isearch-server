@@ -5,6 +5,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { CreateUserDto, ListUsersParams } from 'src/dto';
@@ -26,12 +27,19 @@ export class UsersController {
 
   @Get(':id')
   public async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.userService.findOne(id);
+    return this.userService.getById(id);
   }
 
   @Post()
-  public async create(@Body() createUserDto: CreateUserDto) {
-    await this.userService.create(createUserDto);
-    return 'success';
+  public async create(@Body() CreateUserDto: CreateUserDto) {
+    return await this.userService.create(CreateUserDto);
+  }
+
+  @Put(':id')
+  public async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateUserDto: CreateUserDto,
+  ) {
+    return await this.userService.update(id, updateUserDto);
   }
 }
