@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import User from 'src/entities/User';
 import UserProfile from 'src/entities/UserProfile';
 import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { CreateUserDto, ListUsersParams, UpdateUserDto } from 'src/dto';
+import { CreateUserDto, ListParams, UpdateUserDto } from 'src/dto';
 import { hashPassword } from 'src/utils';
 import { UserNotFound } from './error';
 
@@ -13,7 +13,7 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
 
-  public async findMany(params: ListUsersParams) {
+  public async findMany(params: ListParams) {
     const options: FindManyOptions<User> = {
       skip: 0,
       take: 25,
@@ -28,10 +28,6 @@ export class UsersService {
     if (params.page) {
       params.page = Math.max(0, params.page);
       options.skip = (params.page - 1) * params.perPage;
-    }
-
-    if (params.email) {
-      where.email = params.email;
     }
 
     options.where = where;

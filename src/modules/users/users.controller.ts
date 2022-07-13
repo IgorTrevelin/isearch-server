@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { CreateUserDto, ListUsersParams, UpdateMeDto } from 'src/dto';
+import { CreateUserDto, ListParams, UpdateMeDto } from 'src/dto';
 import User from 'src/entities/User';
 import { stripUsersPasswordHash } from 'src/utils';
 import { Admin } from '../auth/admin.decorator';
@@ -25,8 +25,7 @@ export class UsersController {
 
   @Get('me/')
   public async getMe(@Req() req: Request) {
-    const user: any = req.user;
-    return stripUsersPasswordHash(user);
+    return stripUsersPasswordHash(req.user as User);
   }
 
   @Put('me/')
@@ -40,7 +39,7 @@ export class UsersController {
 
   @Admin()
   @Get()
-  public async findMany(@Query() query: ListUsersParams) {
+  public async findMany(@Query() query: ListParams) {
     const [users, total] = await this.userService.findMany(query);
 
     return {
