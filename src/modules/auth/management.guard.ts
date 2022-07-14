@@ -8,6 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { isUUID } from 'class-validator';
 import { PlansController } from '../plans/plans.controller';
 import { PlansService } from '../plans/plans.service';
+import { MANAGEMENT_ACCESS } from './decorators';
 
 @Injectable()
 export class ManagementGuard implements CanActivate {
@@ -17,14 +18,15 @@ export class ManagementGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const manageable = this.reflector.get<boolean>(
-      'management',
+    const management = this.reflector.get<boolean>(
+      MANAGEMENT_ACCESS,
       context.getHandler(),
     );
 
-    if (!manageable) return true;
-
     const req = context.switchToHttp().getRequest();
+
+    if (!management || req.user.admin) return true;
+
     const controllerClass = context.getClass();
 
     if (controllerClass == PlansController) {

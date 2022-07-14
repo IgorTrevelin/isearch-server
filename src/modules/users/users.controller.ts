@@ -14,8 +14,8 @@ import { Request } from 'express';
 import { CreateUserDto, ListParams, UpdateMeDto } from 'src/dto';
 import User from 'src/entities/User';
 import { stripUsersPasswordHash } from 'src/utils';
-import { Admin } from '../auth/admin.decorator';
 import { AdminGuard } from '../auth/admin.guard';
+import { Admin } from '../auth/decorators';
 import { UsersService } from './users.service';
 
 @UseGuards(AdminGuard)

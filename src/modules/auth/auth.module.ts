@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { PlansModule } from '../plans/plans.module';
 import { UsersModule } from '../users/users.module';
+import { AccessGuard } from './access.guard';
 import { AdminGuard } from './admin.guard';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt.guard';
@@ -37,7 +38,15 @@ import { ManagementGuard } from './management.guard';
       useClass: JwtAuthGuard,
     },
     AdminGuard,
+    ManagementGuard,
+    AccessGuard,
   ],
-  exports: [AuthService, JwtAuthGuard, AdminGuard, ManagementGuard],
+  exports: [
+    AuthService,
+    JwtAuthGuard,
+    AdminGuard,
+    ManagementGuard,
+    AccessGuard,
+  ],
 })
 export class AuthModule {}
