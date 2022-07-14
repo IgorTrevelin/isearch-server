@@ -3,19 +3,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { PlansModule } from '../plans/plans.module';
 import { UsersModule } from '../users/users.module';
-import { AccessGuard } from './access.guard';
 import { AdminGuard } from './admin.guard';
+import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt.guard';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
-import { ManagementGuard } from './management.guard';
 
 @Module({
   imports: [
-    UsersModule,
     PassportModule,
     ConfigModule,
     JwtModule.registerAsync({
@@ -26,7 +23,7 @@ import { ManagementGuard } from './management.guard';
       imports: [ConfigModule],
       inject: [ConfigService],
     }),
-    PlansModule,
+    UsersModule,
   ],
   providers: [
     AuthService,
@@ -38,15 +35,8 @@ import { ManagementGuard } from './management.guard';
       useClass: JwtAuthGuard,
     },
     AdminGuard,
-    ManagementGuard,
-    AccessGuard,
   ],
-  exports: [
-    AuthService,
-    JwtAuthGuard,
-    AdminGuard,
-    ManagementGuard,
-    AccessGuard,
-  ],
+  exports: [AuthService, JwtAuthGuard, AdminGuard],
+  controllers: [AuthController],
 })
 export class AuthModule {}

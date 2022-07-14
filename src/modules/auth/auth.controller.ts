@@ -1,12 +1,12 @@
 import { Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import User from './entities/User';
-import { AuthService } from './modules/auth/auth.service';
-import { Public } from './modules/auth/decorators';
+import User from 'src/entities/User';
+import { AuthService } from './auth.service';
+import { Public } from './decorators';
 
-@Controller()
-export class AppController {
+@Controller('auth')
+export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()

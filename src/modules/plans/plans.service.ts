@@ -2,16 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePlanDto, UpdatePlanDto } from 'src/dto';
 import Plan from 'src/entities/Plan';
-import PlanAccess from 'src/entities/PlanAccess';
 import { Repository } from 'typeorm';
+import { PlanAccessService } from '../planAccess/plan-access.service';
 import { PlanNotExists } from './error';
 
 @Injectable()
 export class PlansService {
   constructor(
     @InjectRepository(Plan) private readonly plansRepo: Repository<Plan>,
-    @InjectRepository(PlanAccess)
-    private readonly planAccessRepo: Repository<PlanAccess>,
+    private readonly planAccessService: PlanAccessService,
   ) {}
 
   public async getById(id: string) {
@@ -48,5 +47,12 @@ export class PlansService {
     await this.plansRepo.softDelete(plan);
 
     return plan;
+  }
+
+  public async getPlanUsers(planId: string) {
+    const plan = await this.getById(planId);
+
+    const access = await this.planAccessService.getByPlan(plan.id);
+    return access.filter((a) => a.endDate >= new Date()).map((a) => a.user);
   }
 }

@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { isUUID } from 'class-validator';
-import { PlanAccessService } from '../plans/plan-access.service';
+import { PlanAccessService } from './plan-access.service';
 import { PlansController } from '../plans/plans.controller';
 import { RESTRICTED_ACCESS } from './decorators';
 
@@ -9,7 +9,7 @@ import { RESTRICTED_ACCESS } from './decorators';
 export class AccessGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly planAccessSerice: PlanAccessService,
+    private readonly planAccessService: PlanAccessService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -27,7 +27,7 @@ export class AccessGuard implements CanActivate {
     if (controllerClass == PlansController) {
       const id = context.getArgByIndex(0);
       if (isUUID(id)) {
-        const accesses = await this.planAccessSerice.getByPlan(id);
+        const accesses = await this.planAccessService.getByPlan(id);
         const userIds = accesses.map((a) => a.user.id);
 
         if (userIds.indexOf(req.user.id) !== -1) return true;

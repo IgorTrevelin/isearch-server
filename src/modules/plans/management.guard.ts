@@ -6,9 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { isUUID } from 'class-validator';
-import { PlansController } from '../plans/plans.controller';
-import { PlansService } from '../plans/plans.service';
-import { MANAGEMENT_ACCESS } from './decorators';
+import { MANAGEMENT } from './decorators';
+import { PlansService } from './plans.service';
 
 @Injectable()
 export class ManagementGuard implements CanActivate {
@@ -19,24 +18,20 @@ export class ManagementGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const management = this.reflector.get<boolean>(
-      MANAGEMENT_ACCESS,
+      MANAGEMENT,
       context.getHandler(),
     );
 
     const req = context.switchToHttp().getRequest();
 
-    if (!management || req.user.admin) return true;
+    if (!management || (req.user && req.user.admin)) return true;
 
-    const controllerClass = context.getClass();
+    const id = context.getArgByIndex(0);
+    if (isUUID(id)) {
+      const plan = await this.plansService.getById(id);
+      const managers = plan.managers.map((manager) => manager.id);
 
-    if (controllerClass == PlansController) {
-      const id = context.getArgByIndex(0);
-      if (isUUID(id)) {
-        const plan = await this.plansService.getById(id);
-        const managers = plan.managers.map((manager) => manager.id);
-
-        if (managers.indexOf(req.user.id) !== -1) return true;
-      }
+      if (managers.indexOf(req.user.id) !== -1) return true;
     }
 
     throw new UnauthorizedException();

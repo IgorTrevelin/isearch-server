@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import Plan from 'src/entities/Plan';
-import PlanAccess from 'src/entities/PlanAccess';
-import { UsersModule } from '../users/users.module';
-import { PlanAccessService } from './plan-access.service';
+import { AuthModule } from '../auth/auth.module';
+import { PlanAccessModule } from '../planAccess/plan-access.module';
+import { ManagementGuard } from './management.guard';
 import { PlansController } from './plans.controller';
 import { PlansService } from './plans.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Plan, PlanAccess]), UsersModule],
-  providers: [PlansService, PlanAccessService],
-  exports: [PlansService, PlanAccessService],
+  imports: [TypeOrmModule.forFeature([Plan]), AuthModule, PlanAccessModule],
+  providers: [PlansService, ManagementGuard],
+  exports: [PlansService],
   controllers: [PlansController],
 })
 export class PlansModule {}

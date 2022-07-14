@@ -10,11 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CreatePlanDto, UpdatePlanDto } from 'src/dto';
-import { AccessGuard } from '../auth/access.guard';
+import { AccessGuard } from '../planAccess/access.guard';
 import { AdminGuard } from '../auth/admin.guard';
-import { Admin, Management } from '../auth/decorators';
-import { ManagementGuard } from '../auth/management.guard';
+import { Management } from './decorators';
 import { PlansService } from './plans.service';
+import { ManagementGuard } from './management.guard';
+import { Admin } from '../auth/decorators';
 
 @UseGuards(AdminGuard, ManagementGuard, AccessGuard)
 @Controller('plans')

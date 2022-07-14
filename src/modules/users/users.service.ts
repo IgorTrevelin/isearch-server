@@ -6,11 +6,13 @@ import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { CreateUserDto, ListParams, UpdateUserDto } from 'src/dto';
 import { hashPassword } from 'src/utils';
 import { UserNotFound } from './error';
+import { PlanAccessService } from '../planAccess/plan-access.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
+    private readonly planAccessService: PlanAccessService,
   ) {}
 
   public async findMany(params: ListParams) {
@@ -125,5 +127,12 @@ export class UsersService {
     }
 
     return await this.userRepo.save(user);
+  }
+
+  public async getUserPlans(userId: string) {
+    const user = await this.getById(userId);
+
+    const access = await this.planAccessService.getByUser(user.id);
+    return access.filter((a) => a.endDate >= new Date()).map((a) => a.plan);
   }
 }
